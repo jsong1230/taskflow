@@ -18,16 +18,17 @@ services:
     restart: unless-stopped
 
     # Environment variables for database configuration
+    # IMPORTANT: These must be set in .env file
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-taskflow}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow_secret}
-      POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
       # Performance tuning (optional, adjust based on your resources)
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
 
     # Expose PostgreSQL on non-standard port to avoid conflicts
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "${POSTGRES_PORT}:5432"
 
     # Persistent data storage
     volumes:
@@ -35,7 +36,7 @@ services:
 
     # Health check to ensure database is ready before dependent services start
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow} -d ${POSTGRES_DB:-taskflow}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -64,7 +65,7 @@ services:
 
     # Expose backend API
     ports:
-      - "${BACKEND_PORT:-8000}:8000"
+      - "${BACKEND_PORT}:8000"
 
     # Mount source code for hot-reload in development
     volumes:
@@ -79,7 +80,8 @@ services:
     # Additional environment variables
     environment:
       # Override DATABASE_URL to use docker service name
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-taskflow}:${POSTGRES_PASSWORD:-taskflow_secret}@db:5432/${POSTGRES_DB:-taskflow}
+      # IMPORTANT: Credentials must be set in .env file
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       # Development mode settings
       PYTHONUNBUFFERED: 1
       WATCHFILES_FORCE_POLLING: "true"
@@ -117,7 +119,7 @@ services:
 
     # Expose frontend
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      - "${FRONTEND_PORT}:3000"
 
     # Mount source code for hot-reload in development
     volumes:
@@ -133,7 +135,7 @@ services:
     # Additional environment variables
     environment:
       # Ensure frontend knows where to find the backend
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       # Enable Next.js fast refresh
       WATCHPACK_POLLING: "true"
 
