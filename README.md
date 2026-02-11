@@ -110,17 +110,25 @@ taskflow/
 - **Docker** 및 **Docker Compose** 설치
 - (또는) **Python 3.12+**, **Node.js 18+**, **PostgreSQL 16**
 
-### 1. 환경변수 설정
+### 1. 환경변수 설정 ⚠️ 필수
 
 ```bash
-# 루트 디렉토리에서
+# 루트 디렉토리에서 .env.example을 복사
 cp .env.example .env
 
-# 환경변수 편집 (필요한 경우)
-# - DATABASE_URL
-# - JWT_SECRET_KEY
-# - NEXT_PUBLIC_API_URL
+# .env 파일을 열어서 비밀번호 변경 (중요!)
+nano .env  # 또는 원하는 에디터 사용
+
+# 반드시 변경해야 할 값:
+# - POSTGRES_PASSWORD: 강력한 비밀번호로 변경
+# - JWT_SECRET_KEY: 보안키 생성 (openssl rand -hex 32)
+# - (프로덕션) NEXT_PUBLIC_API_URL: 실제 API URL로 변경
 ```
+
+**⚠️ 보안 주의사항:**
+- `.env` 파일은 Git에 커밋하지 마세요 (`.gitignore`에 포함됨)
+- 프로덕션 환경에서는 반드시 강력한 비밀번호 사용
+- JWT_SECRET_KEY는 `openssl rand -hex 32` 명령으로 생성 권장
 
 ### 2. Docker Compose로 실행 (권장)
 
