@@ -1,47 +1,161 @@
+version: '3.8'
+
+# Custom network for service isolation and communication
+networks:
+  taskflow-network:
+    driver: bridge
+
+# Named volumes for persistent data
+volumes:
+  postgres_data:
+    driver: local
+
 services:
+  # PostgreSQL Database Service
   db:
     image: postgres:16-alpine
+    container_name: taskflow-db
+    restart: unless-stopped
+
+    # Environment variables for database configuration
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-taskflow}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow_secret}
       POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+      # Performance tuning (optional, adjust based on your resources)
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+
+    # Expose PostgreSQL on non-standard port to avoid conflicts
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
+
+    # Persistent data storage
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    # Health check to ensure database is ready before dependent services start
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow} -d ${POSTGRES_DB:-taskflow}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
+    networks:
+      - taskflow-network
+
+    # Resource limits (optional, uncomment and adjust as needed)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+  # FastAPI Backend Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
+    container_name: taskflow-backend
+    restart: unless-stopped
+
+    # Expose backend API
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
+
+    # Mount source code for hot-reload in development
     volumes:
       - ./backend:/app
+      # Prevent overwriting installed packages
+      - /app/.venv
+
+    # Load environment variables
     env_file:
       - .env
+
+    # Additional environment variables
+    environment:
+      # Override DATABASE_URL to use docker service name
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-taskflow}:${POSTGRES_PASSWORD:-taskflow_secret}@db:5432/${POSTGRES_DB:-taskflow}
+      # Development mode settings
+      PYTHONUNBUFFERED: 1
+      WATCHFILES_FORCE_POLLING: "true"
+
+    # Wait for database to be healthy before starting
     depends_on:
       db:
         condition: service_healthy
 
+    # Health check for backend service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    networks:
+      - taskflow-network
+
+    # Resource limits (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M
+
+  # Next.js Frontend Service
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    container_name: taskflow-frontend
+    restart: unless-stopped
+
+    # Expose frontend
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
+
+    # Mount source code for hot-reload in development
     volumes:
       - ./frontend:/app
+      # Prevent overwriting node_modules and .next
       - /app/node_modules
+      - /app/.next
+
+    # Load environment variables
     env_file:
       - .env
-    depends_on:
-      - backend
 
-volumes:
-  postgres_data:
+    # Additional environment variables
+    environment:
+      # Ensure frontend knows where to find the backend
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      # Enable Next.js fast refresh
+      WATCHPACK_POLLING: "true"
+
+    # Wait for backend to be healthy before starting
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    # Health check for frontend service
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    networks:
+      - taskflow-network
+
+    # Resource limits (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M

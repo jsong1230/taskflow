@@ -30,6 +30,9 @@ out/
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+.env.test
 
 # OS
 .DS_Store
@@ -37,6 +40,24 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+
+# SSL Certificates (NEVER commit!)
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
+!nginx/ssl/README.md
+
+# Backups
+*.sql
+*.dump
+*.tar.gz
+backups/
 
 # Testing
 .coverage
