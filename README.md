@@ -181,6 +181,29 @@ npm install
 npm run dev
 ```
 
+### 4. Git Hooks 설정 (권장)
+
+커밋 전 자동으로 코드 검사를 실행하도록 설정:
+
+```bash
+# Pre-commit hook 설치
+./scripts/install-hooks.sh
+
+# 또는 수동으로 모든 검사 실행
+./scripts/check-all.sh
+```
+
+**설치 후 동작:**
+- 커밋 시 자동으로 lint, format 검사 실행
+- 데이터베이스가 실행 중이면 pytest도 함께 실행
+- 모든 검사 통과 시에만 커밋 허용
+- 긴급 상황 시 `git commit --no-verify`로 스킵 가능
+
+**데이터베이스 테스트:**
+- pre-commit hook은 데이터베이스가 없어도 커밋 가능 (lint/format만 실행)
+- 전체 테스트를 실행하려면: `docker compose up -d` 후 커밋
+- CI/CD 파이프라인에서는 항상 전체 테스트가 실행됩니다
+
 ---
 
 ## 📖 사용 방법
