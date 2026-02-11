@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Task, TaskStatus } from '@/types/api';
 import { taskApi } from '@/lib/api';
 import KanbanColumn from './KanbanColumn';
@@ -26,11 +26,7 @@ export default function KanbanBoard({
   const [isLoading, setIsLoading] = useState(true);
   const [draggedTaskId, setDraggedTaskId] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [projectId]);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await taskApi.list(projectId);
@@ -41,7 +37,11 @@ export default function KanbanBoard({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const handleDragStart = (e: React.DragEvent, taskId: number) => {
     setDraggedTaskId(taskId);
@@ -87,11 +87,6 @@ export default function KanbanBoard({
 
   const getTasksByStatus = (status: TaskStatus) => {
     return tasks.filter((task) => task.status === status);
-  };
-
-  // 외부에서 태스크 목록 갱신 (태스크 생성/수정/삭제 후)
-  const refreshTasks = () => {
-    fetchTasks();
   };
 
   if (isLoading) {

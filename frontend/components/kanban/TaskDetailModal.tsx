@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { Task, TaskStatus, TaskPriority } from '@/types/api';
 import { taskApi } from '@/lib/api';
 import CommentSection from './CommentSection';
@@ -24,11 +24,7 @@ export default function TaskDetailModal({
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    fetchTask();
-  }, [taskId]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await taskApi.get(projectId, taskId);
@@ -40,7 +36,11 @@ export default function TaskDetailModal({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId, taskId, onClose]);
+
+  useEffect(() => {
+    fetchTask();
+  }, [fetchTask]);
 
   const handleUpdateField = async (updates: Partial<Task>) => {
     if (!task) return;

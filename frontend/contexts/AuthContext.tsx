@@ -22,19 +22,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 초기 로드: 토큰이 있으면 사용자 정보 가져오기
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      authApi
-        .me()
-        .then((user) => setUser(user))
-        .catch(() => {
-          // 토큰이 유효하지 않으면 제거
-          setToken(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    const checkAuth = async () => {
+      const token = getToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const userData = await authApi.me();
+        setUser(userData);
+      } catch {
+        // 토큰이 유효하지 않으면 제거
+        setToken(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -45,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (email: string, name: string, password: string) => {
-    const user = await authApi.register({ email, name, password });
+    await authApi.register({ email, name, password });
     // 회원가입 후 자동 로그인
     await login(email, password);
   };

@@ -1,7 +1,6 @@
 import pytest
 from httpx import AsyncClient
 
-
 BASE = "/api/v1/projects"
 
 

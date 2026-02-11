@@ -24,7 +24,6 @@ from app.services.comment import create_comment, get_task_comments
 from app.services.project import (
     add_project_member,
     create_project,
-    delete_project,
     get_project_by_id,
     get_user_projects,
     update_project,

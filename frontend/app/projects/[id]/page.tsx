@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { projectApi } from '@/lib/api';
@@ -20,12 +20,7 @@ export default function ProjectPage() {
   const [createTaskStatus, setCreateTaskStatus] = useState<TaskStatus | null>(null);
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
-  useEffect(() => {
-    if (!projectId) return;
-    fetchProject();
-  }, [projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await projectApi.get(projectId);
@@ -37,7 +32,12 @@ export default function ProjectPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId, router]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    fetchProject();
+  }, [projectId, fetchProject]);
 
   const handleTaskClick = (taskId: number) => {
     setSelectedTaskId(taskId);

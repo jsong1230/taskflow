@@ -1,6 +1,5 @@
 import enum
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -38,7 +37,7 @@ class Task(Base):
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE")
     )
-    assignee_id: Mapped[Optional[int]] = mapped_column(
+    assignee_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )

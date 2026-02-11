@@ -33,7 +33,6 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ):
     """JWT 토큰에서 현재 사용자 정보 가져오기"""
-    from app.models.user import User
     from app.services.user import get_user_by_id
 
     payload = decode_access_token(token)

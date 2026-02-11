@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { Comment } from '@/types/api';
 import { commentApi } from '@/lib/api';
 
@@ -15,11 +15,7 @@ export default function CommentSection({ projectId, taskId }: CommentSectionProp
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchComments();
-  }, [taskId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await commentApi.list(projectId, taskId);
@@ -29,7 +25,11 @@ export default function CommentSection({ projectId, taskId }: CommentSectionProp
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId, taskId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
