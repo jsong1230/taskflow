@@ -1,0 +1,9 @@
+# 프로덕션 의존성 포함
+-r requirements.txt
+
+# 개발 도구
+ruff==0.8.4
+
+# 테스트 도구
+pytest-cov==6.0.0
+coverage[toml]==7.6.9
