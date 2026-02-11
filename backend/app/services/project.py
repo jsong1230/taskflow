@@ -55,9 +55,7 @@ async def get_project_by_id(
 ) -> Project | None:
     """ID로 프로젝트 조회 (members eager load)"""
     result = await db.execute(
-        select(Project)
-        .options(selectinload(Project.members))
-        .where(Project.id == project_id)
+        select(Project).options(selectinload(Project.members)).where(Project.id == project_id)
     )
     return result.scalar_one_or_none()
 

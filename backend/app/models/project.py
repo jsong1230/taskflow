@@ -19,9 +19,7 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(2000), default="")
-    owner_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
-    )
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     owner = relationship("User", back_populates="projects_owned")
@@ -31,17 +29,11 @@ class Project(Base):
 
 class ProjectMember(Base):
     __tablename__ = "project_members"
-    __table_args__ = (
-        UniqueConstraint("user_id", "project_id"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "project_id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
-    )
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id", ondelete="CASCADE")
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
     role: Mapped[ProjectRole] = mapped_column(
         Enum(ProjectRole, native_enum=False),
         default=ProjectRole.member,

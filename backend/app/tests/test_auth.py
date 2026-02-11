@@ -27,9 +27,7 @@ class TestRegister:
         assert "hashed_password" not in data
 
         # DB에 사용자가 생성되었는지 확인
-        result = await db_session.execute(
-            select(User).where(User.email == "newuser@example.com")
-        )
+        result = await db_session.execute(select(User).where(User.email == "newuser@example.com"))
         user = result.scalar_one_or_none()
         assert user is not None
         assert user.email == "newuser@example.com"
@@ -151,9 +149,7 @@ class TestLogin:
 class TestGetMe:
     """현재 사용자 정보 조회 테스트"""
 
-    async def test_get_me_success(
-        self, client: AsyncClient, test_user: User, auth_headers: dict
-    ):
+    async def test_get_me_success(self, client: AsyncClient, test_user: User, auth_headers: dict):
         """정상적인 현재 사용자 정보 조회"""
         response = await client.get("/api/v1/auth/me", headers=auth_headers)
         assert response.status_code == 200

@@ -29,8 +29,6 @@ async def get_task_comments(
 ) -> list[Comment]:
     """댓글 목록 (created_at ASC)"""
     result = await db.execute(
-        select(Comment)
-        .where(Comment.task_id == task_id)
-        .order_by(Comment.created_at.asc())
+        select(Comment).where(Comment.task_id == task_id).order_by(Comment.created_at.asc())
     )
     return list(result.scalars().all())

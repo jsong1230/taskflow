@@ -16,9 +16,7 @@ def comments_url(project_id: int, task_id: int) -> str:
 
 class TestCreateTask:
     @pytest.mark.asyncio
-    async def test_create_task_success(
-        self, client: AsyncClient, auth_headers: dict, test_project
-    ):
+    async def test_create_task_success(self, client: AsyncClient, auth_headers: dict, test_project):
         response = await client.post(
             tasks_url(test_project.id),
             json={"title": "New Task"},
@@ -54,9 +52,7 @@ class TestCreateTask:
         assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_create_task_project_not_found(
-        self, client: AsyncClient, auth_headers: dict
-    ):
+    async def test_create_task_project_not_found(self, client: AsyncClient, auth_headers: dict):
         response = await client.post(
             tasks_url(99999),
             json={"title": "No Project"},
@@ -70,9 +66,7 @@ class TestListTasks:
     async def test_list_tasks(
         self, client: AsyncClient, auth_headers: dict, test_project, test_task
     ):
-        response = await client.get(
-            tasks_url(test_project.id), headers=auth_headers
-        )
+        response = await client.get(tasks_url(test_project.id), headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
         assert len(data) >= 1
@@ -149,9 +143,7 @@ class TestListTasks:
     async def test_list_tasks_non_member(
         self, client: AsyncClient, other_auth_headers: dict, test_project
     ):
-        response = await client.get(
-            tasks_url(test_project.id), headers=other_auth_headers
-        )
+        response = await client.get(tasks_url(test_project.id), headers=other_auth_headers)
         assert response.status_code == 403
 
 
@@ -160,19 +152,13 @@ class TestGetTask:
     async def test_get_task_success(
         self, client: AsyncClient, auth_headers: dict, test_project, test_task
     ):
-        response = await client.get(
-            task_url(test_project.id, test_task.id), headers=auth_headers
-        )
+        response = await client.get(task_url(test_project.id, test_task.id), headers=auth_headers)
         assert response.status_code == 200
         assert response.json()["title"] == "Test Task"
 
     @pytest.mark.asyncio
-    async def test_get_task_not_found(
-        self, client: AsyncClient, auth_headers: dict, test_project
-    ):
-        response = await client.get(
-            task_url(test_project.id, 99999), headers=auth_headers
-        )
+    async def test_get_task_not_found(self, client: AsyncClient, auth_headers: dict, test_project):
+        response = await client.get(task_url(test_project.id, 99999), headers=auth_headers)
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -194,9 +180,7 @@ class TestGetTask:
         )
         await db_session.flush()
 
-        response = await client.get(
-            task_url(project2.id, test_task.id), headers=auth_headers
-        )
+        response = await client.get(task_url(project2.id, test_task.id), headers=auth_headers)
         assert response.status_code == 404
 
 
@@ -279,9 +263,7 @@ class TestDeleteTask:
     async def test_delete_task_not_found(
         self, client: AsyncClient, auth_headers: dict, test_project
     ):
-        response = await client.delete(
-            task_url(test_project.id, 99999), headers=auth_headers
-        )
+        response = await client.delete(task_url(test_project.id, 99999), headers=auth_headers)
         assert response.status_code == 404
 
     @pytest.mark.asyncio

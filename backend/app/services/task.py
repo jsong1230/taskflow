@@ -64,9 +64,7 @@ async def get_task_by_id(
     project_id: int,
 ) -> Task | None:
     """태스크 조회 (project_id 일치 확인)"""
-    result = await db.execute(
-        select(Task).where(Task.id == task_id, Task.project_id == project_id)
-    )
+    result = await db.execute(select(Task).where(Task.id == task_id, Task.project_id == project_id))
     return result.scalar_one_or_none()
 
 

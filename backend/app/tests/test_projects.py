@@ -19,9 +19,7 @@ class TestCreateProject:
         assert "id" in data
 
     @pytest.mark.asyncio
-    async def test_create_project_owner_membership(
-        self, client: AsyncClient, auth_headers: dict
-    ):
+    async def test_create_project_owner_membership(self, client: AsyncClient, auth_headers: dict):
         """생성 후 owner 멤버십이 자동 추가되는지 확인"""
         resp = await client.post(
             BASE + "/",
@@ -49,9 +47,7 @@ class TestCreateProject:
 
 class TestListProjects:
     @pytest.mark.asyncio
-    async def test_list_projects(
-        self, client: AsyncClient, auth_headers: dict, test_project
-    ):
+    async def test_list_projects(self, client: AsyncClient, auth_headers: dict, test_project):
         response = await client.get(BASE + "/", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
@@ -59,9 +55,7 @@ class TestListProjects:
         assert any(p["name"] == "Test Project" for p in data)
 
     @pytest.mark.asyncio
-    async def test_list_projects_empty(
-        self, client: AsyncClient, other_auth_headers: dict
-    ):
+    async def test_list_projects_empty(self, client: AsyncClient, other_auth_headers: dict):
         """멤버가 아닌 사용자는 빈 목록"""
         response = await client.get(BASE + "/", headers=other_auth_headers)
         assert response.status_code == 200
@@ -75,12 +69,8 @@ class TestListProjects:
 
 class TestGetProject:
     @pytest.mark.asyncio
-    async def test_get_project_success(
-        self, client: AsyncClient, auth_headers: dict, test_project
-    ):
-        response = await client.get(
-            f"{BASE}/{test_project.id}", headers=auth_headers
-        )
+    async def test_get_project_success(self, client: AsyncClient, auth_headers: dict, test_project):
+        response = await client.get(f"{BASE}/{test_project.id}", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "Test Project"
@@ -90,15 +80,11 @@ class TestGetProject:
     async def test_get_project_non_member(
         self, client: AsyncClient, other_auth_headers: dict, test_project
     ):
-        response = await client.get(
-            f"{BASE}/{test_project.id}", headers=other_auth_headers
-        )
+        response = await client.get(f"{BASE}/{test_project.id}", headers=other_auth_headers)
         assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_get_project_not_found(
-        self, client: AsyncClient, auth_headers: dict
-    ):
+    async def test_get_project_not_found(self, client: AsyncClient, auth_headers: dict):
         response = await client.get(f"{BASE}/99999", headers=auth_headers)
         assert response.status_code == 404
 
@@ -163,9 +149,7 @@ class TestDeleteProject:
     async def test_delete_project_owner(
         self, client: AsyncClient, auth_headers: dict, test_project
     ):
-        response = await client.delete(
-            f"{BASE}/{test_project.id}", headers=auth_headers
-        )
+        response = await client.delete(f"{BASE}/{test_project.id}", headers=auth_headers)
         assert response.status_code == 204
 
     @pytest.mark.asyncio
@@ -188,18 +172,14 @@ class TestDeleteProject:
         db_session.add(m)
         await db_session.flush()
 
-        response = await client.delete(
-            f"{BASE}/{test_project.id}", headers=other_auth_headers
-        )
+        response = await client.delete(f"{BASE}/{test_project.id}", headers=other_auth_headers)
         assert response.status_code == 403
 
     @pytest.mark.asyncio
     async def test_delete_project_non_member_forbidden(
         self, client: AsyncClient, other_auth_headers: dict, test_project
     ):
-        response = await client.delete(
-            f"{BASE}/{test_project.id}", headers=other_auth_headers
-        )
+        response = await client.delete(f"{BASE}/{test_project.id}", headers=other_auth_headers)
         assert response.status_code == 403
 
 

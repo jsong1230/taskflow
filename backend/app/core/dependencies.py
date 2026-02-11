@@ -71,9 +71,7 @@ async def get_project_member(
     from app.models.project import Project, ProjectMember
 
     # 프로젝트 존재 여부 확인
-    result = await db.execute(
-        select(Project).where(Project.id == project_id)
-    )
+    result = await db.execute(select(Project).where(Project.id == project_id))
     project = result.scalar_one_or_none()
     if project is None:
         raise HTTPException(
