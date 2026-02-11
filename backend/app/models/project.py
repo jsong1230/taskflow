@@ -25,8 +25,8 @@ class Project(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     owner = relationship("User", back_populates="projects_owned")
-    members = relationship("ProjectMember", back_populates="project")
-    tasks = relationship("Task", back_populates="project")
+    members = relationship("ProjectMember", back_populates="project", passive_deletes=True)
+    tasks = relationship("Task", back_populates="project", passive_deletes=True)
 
 
 class ProjectMember(Base):

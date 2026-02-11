@@ -50,4 +50,4 @@ class Task(Base):
 
     project = relationship("Project", back_populates="tasks")
     assignee = relationship("User", back_populates="assigned_tasks")
-    comments = relationship("Comment", back_populates="task")
+    comments = relationship("Comment", back_populates="task", passive_deletes=True)
