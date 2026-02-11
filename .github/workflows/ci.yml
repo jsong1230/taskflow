@@ -56,6 +56,13 @@ jobs:
           # Formatting check
           ruff format --check app/
 
+      - name: Run database migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://taskflow:taskflow_password@localhost:5432/taskflow_test
+        run: |
+          alembic upgrade head
+
       - name: Run tests with pytest
         working-directory: backend
         env:
