@@ -128,9 +128,9 @@ class TestCompleteUserJourney:
         projects_list_time = time.time() - projects_list_start
         print(f"프로젝트 목록 조회 응답 시간: {projects_list_time:.3f}s")
 
-        assert projects_response.status_code == 200, (
-            f"프로젝트 목록 조회 실패: {projects_response.json()}"
-        )
+        assert (
+            projects_response.status_code == 200
+        ), f"프로젝트 목록 조회 실패: {projects_response.json()}"
         projects = projects_response.json()
         assert len(projects) >= 1
         assert any(p["id"] == project_id for p in projects)
@@ -199,9 +199,9 @@ class TestCompleteUserJourney:
         status_time = time.time() - status_start
         print(f"태스크 상태 변경 응답 시간: {status_time:.3f}s")
 
-        assert status_response.status_code == 200, (
-            f"태스크 상태 변경 실패: {status_response.json()}"
-        )
+        assert (
+            status_response.status_code == 200
+        ), f"태스크 상태 변경 실패: {status_response.json()}"
         updated_task = status_response.json()
         assert updated_task["status"] == "in_progress"
         print("✓ 태스크 상태 변경 성공: todo -> in_progress")
@@ -220,9 +220,9 @@ class TestCompleteUserJourney:
         task_detail_time = time.time() - task_detail_start
         print(f"태스크 상세 조회 응답 시간: {task_detail_time:.3f}s")
 
-        assert task_detail_response.status_code == 200, (
-            f"태스크 상세 조회 실패: {task_detail_response.json()}"
-        )
+        assert (
+            task_detail_response.status_code == 200
+        ), f"태스크 상세 조회 실패: {task_detail_response.json()}"
         task_detail = task_detail_response.json()
         assert task_detail["id"] == task_id
         assert task_detail["status"] == "in_progress"
@@ -265,9 +265,9 @@ class TestCompleteUserJourney:
         comments_list_time = time.time() - comments_list_start
         print(f"댓글 목록 조회 응답 시간: {comments_list_time:.3f}s")
 
-        assert comments_response.status_code == 200, (
-            f"댓글 목록 조회 실패: {comments_response.json()}"
-        )
+        assert (
+            comments_response.status_code == 200
+        ), f"댓글 목록 조회 실패: {comments_response.json()}"
         comments = comments_response.json()
         assert len(comments) >= 1
         assert any(c["id"] == comment_id for c in comments)
